@@ -6,10 +6,14 @@ import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import com.enigmacamp.mycoroutine.databinding.ActivityMainBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.concurrent.thread
 
 /*
-    - Berikut contoh menggunakan thread terpisah
+    - Berikut contoh menggunakan Coroutine
 
     - Coba simulasikan contoh sederhana dibawah ini
 
@@ -34,25 +38,37 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun seperateThread() {
+    suspend fun counterCoroutine() {
         isRunning = true
-        thread(true) {
-            Log.d("Main", "Running on thread ${Thread.currentThread().name}")
-            while (this.isRunning) {
-                counterResult++
-                Thread.sleep(1000)
-                runOnUiThread {
-                    updateCounterCallback(counterResult)
-                }
-            }
+        Log.d("Main", "Running on thread ${Thread.currentThread().name}")
+        while (this.isRunning) {
+            counterResult++
+            delay(1000)
+            updateCounterCallback(counterResult)
         }
     }
+//    fun seperateThread() {
+//        isRunning = true
+//        thread(true) {
+//            Log.d("Main", "Running on thread ${Thread.currentThread().name}")
+//            while (this.isRunning) {
+//                counterResult++
+//                Thread.sleep(1000)
+//                    updateCounterCallback(counterResult)
+//                }
+//            }
+//        }
+//    }
 
     private fun updateCounterCallback(counter: Int) {
         binding.counterTextView.setText("$counter")
     }
 
+
     private fun fakeHeavyProcessSimulation() {
-        seperateThread()
+//        seperateThread()
+        CoroutineScope(Dispatchers.Main).launch {
+            counterCoroutine()
+        }
     }
 }
