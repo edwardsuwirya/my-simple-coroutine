@@ -6,10 +6,7 @@ import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import com.enigmacamp.mycoroutine.databinding.ActivityMainBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlin.concurrent.thread
 
 /*
@@ -21,7 +18,7 @@ import kotlin.concurrent.thread
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     var counterResult = 0
-    var isRunning = false
+    lateinit var job: Job
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -33,32 +30,19 @@ class MainActivity : AppCompatActivity() {
                 Log.d("Main", "Running on thread ${Thread.currentThread().name}")
             }
             stopButton.setOnClickListener {
-                isRunning = false
+                job.cancel()
             }
         }
     }
 
     suspend fun counterCoroutine() {
-        isRunning = true
         Log.d("Main", "Running on thread ${Thread.currentThread().name}")
-        while (this.isRunning) {
+        while (job.isActive) {
             counterResult++
             delay(1000)
             updateCounterCallback(counterResult)
         }
     }
-//    fun seperateThread() {
-//        isRunning = true
-//        thread(true) {
-//            Log.d("Main", "Running on thread ${Thread.currentThread().name}")
-//            while (this.isRunning) {
-//                counterResult++
-//                Thread.sleep(1000)
-//                    updateCounterCallback(counterResult)
-//                }
-//            }
-//        }
-//    }
 
     private fun updateCounterCallback(counter: Int) {
         binding.counterTextView.setText("$counter")
@@ -66,8 +50,7 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun fakeHeavyProcessSimulation() {
-//        seperateThread()
-        CoroutineScope(Dispatchers.Main).launch {
+        job = CoroutineScope(Dispatchers.Main).launch {
             counterCoroutine()
         }
     }
