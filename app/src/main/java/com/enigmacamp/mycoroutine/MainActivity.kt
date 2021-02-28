@@ -2,23 +2,14 @@ package com.enigmacamp.mycoroutine
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import com.enigmacamp.mycoroutine.databinding.ActivityMainBinding
+import kotlin.concurrent.thread
 
 /*
-    - Di dalam pengembangan aplikasi android, jangan ada proses yang mem-blocking main thread
-
-    - Main thread dalam android, adalah thread yang befungsi untuk meng-update screen UI,
-      meng-handle event click, dan beberap UI callback
-
-    - Update screen UI oleh Main Thread dilakukan dengan kecepatan 60 frame per detik (dengan kata lain
-      proses update screen dilakukan per 16ms)
-
-    - Banyak proses yang kita pakai nanti, lebih lambat dari update screen UI, seperti nulis data
-      ke database, fetch data ke API, oleh karenanya apabila proses tersebut dilakukan di Main Thread
-      dapat menyebabkan UI pause/freeze, dan kalau lebih parah, waktu freeze nya lama, bisa menyebabkan
-      Application Not Responding
+    - Berikut contoh menggunakan thread terpisah
 
     - Coba simulasikan contoh sederhana dibawah ini
 
@@ -26,6 +17,7 @@ import com.enigmacamp.mycoroutine.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     var counterResult = 0
+    var isRunning = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -35,15 +27,27 @@ class MainActivity : AppCompatActivity() {
             counterTextView
             startButton.setOnClickListener {
                 fakeHeavyProcessSimulation()
+                Log.d("Main", "Running on thread ${Thread.currentThread().name}")
+            }
+            stopButton.setOnClickListener {
+                isRunning = false
+            }
+        }
+    }
+
+    fun seperateThread() {
+        isRunning = true
+        thread(true) {
+            Log.d("Main", "Running on thread ${Thread.currentThread().name}")
+            while (this.isRunning) {
+                counterResult++
+                Thread.sleep(1000)
+                runOnUiThread { binding.counterTextView.setText(counterResult.toString()) }
             }
         }
     }
 
     private fun fakeHeavyProcessSimulation() {
-        repeat(1_000) {
-            counterResult++
-            Thread.sleep(1000)
-            binding.counterTextView.setText(counterResult.toString())
-        }
+        seperateThread()
     }
 }
