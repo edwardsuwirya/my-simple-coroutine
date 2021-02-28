@@ -41,9 +41,15 @@ class MainActivity : AppCompatActivity() {
             while (this.isRunning) {
                 counterResult++
                 Thread.sleep(1000)
-                runOnUiThread { binding.counterTextView.setText(counterResult.toString()) }
+                runOnUiThread {
+                    updateCounterCallback(counterResult)
+                }
             }
         }
+    }
+
+    private fun updateCounterCallback(counter: Int) {
+        binding.counterTextView.setText("$counter")
     }
 
     private fun fakeHeavyProcessSimulation() {
