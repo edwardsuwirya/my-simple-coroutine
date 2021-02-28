@@ -49,6 +49,9 @@ class MainActivity : AppCompatActivity() {
         Log.d("Main", "Running on thread evenodd ${Thread.currentThread().name}")
         repeat(1000) {
             delay(500)
+            if (it == 5) {
+                throw Exception("Exception simulation")
+            }
             if (it % 2 == 0) {
                 updateEventOddCallback("$it is Even")
             } else {
@@ -72,9 +75,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fakeVeryHeavyProcessSimulation() {
-        job = CoroutineScope(Dispatchers.Main).launch {
+        val exceptionHandler =
+            CoroutineExceptionHandler { coroutineContext, throwable -> Log.d("Main", "error") }
+        job = CoroutineScope(Dispatchers.Main + exceptionHandler).launch {
             val childJob1 = launch { counterCoroutine() }
             val childJob2 = launch { counterEvenOddCoroutine() }
+            Log.d("Main", "Finish")
         }
     }
 }
