@@ -24,7 +24,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.apply {
-            counterTextView
             startButton.setOnClickListener {
                 fakeHeavyProcessSimulation()
                 Log.d("Main", "Running on thread ${Thread.currentThread().name}")
