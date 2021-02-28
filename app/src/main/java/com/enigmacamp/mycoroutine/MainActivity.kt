@@ -26,7 +26,8 @@ class MainActivity : AppCompatActivity() {
 
         binding.apply {
             startButton.setOnClickListener {
-                fakeHeavyProcessSimulation()
+//                fakeHeavyProcessSimulation()
+                fakeVeryHeavyProcessSimulation()
                 Log.d("Main", "Running on thread ${Thread.currentThread().name}")
             }
             stopButton.setOnClickListener {
@@ -44,14 +45,36 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    suspend fun counterEvenOddCoroutine() {
+        Log.d("Main", "Running on thread evenodd ${Thread.currentThread().name}")
+        repeat(1000) {
+            delay(500)
+            if (it % 2 == 0) {
+                updateEventOddCallback("$it is Even")
+            } else {
+                updateEventOddCallback("$it is Odd")
+            }
+        }
+    }
+
     private fun updateCounterCallback(counter: Int) {
         binding.counterTextView.setText("$counter")
     }
 
+    private fun updateEventOddCallback(evenOdd: String) {
+        binding.evenOddTextView.setText(evenOdd)
+    }
 
     private fun fakeHeavyProcessSimulation() {
         job = CoroutineScope(Dispatchers.Main).launch {
             counterCoroutine()
+        }
+    }
+
+    private fun fakeVeryHeavyProcessSimulation() {
+        job = CoroutineScope(Dispatchers.Main).launch {
+            val childJob1 = launch { counterCoroutine() }
+            val childJob2 = launch { counterEvenOddCoroutine() }
         }
     }
 }
