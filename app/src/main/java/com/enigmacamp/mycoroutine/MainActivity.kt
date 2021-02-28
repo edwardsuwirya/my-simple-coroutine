@@ -38,6 +38,9 @@ class MainActivity : AppCompatActivity() {
                 isRunning = true
                 fakeHeavyProcessSimulation()
             }
+            stopButton.setOnClickListener {
+                isRunning = false
+            }
         }
     }
 
