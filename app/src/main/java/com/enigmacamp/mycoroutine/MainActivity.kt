@@ -26,6 +26,7 @@ import com.enigmacamp.mycoroutine.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     var counterResult = 0
+    var isRunning = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -34,13 +35,14 @@ class MainActivity : AppCompatActivity() {
         binding.apply {
             counterTextView
             startButton.setOnClickListener {
+                isRunning = true
                 fakeHeavyProcessSimulation()
             }
         }
     }
 
     private fun fakeHeavyProcessSimulation() {
-        repeat(1_000) {
+        while (this.isRunning) {
             counterResult++
             Thread.sleep(1000)
             binding.counterTextView.setText(counterResult.toString())
