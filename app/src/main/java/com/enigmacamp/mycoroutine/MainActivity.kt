@@ -33,7 +33,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.apply {
-            counterTextView
             startButton.setOnClickListener {
                 isRunning = true
                 fakeHeavyProcessSimulation()
